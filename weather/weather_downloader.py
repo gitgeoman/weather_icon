@@ -146,6 +146,5 @@ if __name__ == "__main__":
     downloader = IconEuApiDownloader()
     downloaded_files = downloader.get_data((output_directory, forecast_hour), date)
 
-    logger.info(f"Downloaded files:{downloaded_files}")
     # for file in downloaded_files:
     #     logger.info(file)

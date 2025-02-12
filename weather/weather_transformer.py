@@ -5,3 +5,8 @@ class Transformer(ABC):
     def get_transform(self):
         """transform method varies depending on weather source"""
         ...
+
+
+class IconEuTransformer(Transformer):
+    def get_transform(self):
+        pass

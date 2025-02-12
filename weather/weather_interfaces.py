@@ -18,7 +18,6 @@ class HandlerWeatherFactory(ABC):
     def get_transformer(self) -> weather_transformer.Transformer:
         ...
 
-
     @abstractmethod
     def get_uploader(self) -> weather_uploader.Uploader:
         ...
@@ -32,6 +31,9 @@ class IconEuWeatherFactory(HandlerWeatherFactory):
 
     def get_extractor(self) -> weather_extractor.Extractor:
         return weather_extractor.IconEuExtractor()
+
+    def get_transformer(self) -> weather_transformer.Transformer:
+        return weather_transformer.IconEuTransformer()
 
     def get_uploader(self) -> weather_uploader.Uploader:
         return weather_uploader.DBUploader()
