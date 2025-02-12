@@ -16,24 +16,22 @@ class Downloader(ABC):
         ...
 
 
-
 class IconEuApiDownloader(Downloader):
     """Downloader for ICON-EU weather model data."""
     # Stałe globalne
-    LEVELS_T_SO = [0,] # 2, 5, 6, 18, 54, 162]
-    LEVELS_W_SO = [0,]# 1, 3, 9, 27, 81, 243]
+    LEVELS_T_SO = [0, ]  # 2, 5, 6, 18, 54, 162]
+    LEVELS_W_SO = [0, ]  # 1, 3, 9, 27, 81, 243]
     FORECAST_HOURS = ["000", "003", "006", "009", "012", "015", "018", "021", "024",
                       "027", "030", "033", "036", "039", "042", "048"]
     BASE_URL = "https://opendata.dwd.de/weather/nwp/icon-eu/grib"
     DOWNLOAD_FOLDER = "downloads"
     OUTPUT_FOLDER = "processed_data"
 
-
     def get_data(self, id_geom: tuple, date: str) -> list:
         output_folder, forecast_hour = id_geom
 
         # Generate ICON-EU file URLs
-        links = self.generate_icon_links(
+        links: list = self.generate_icon_links(
             date=date,
             hour=forecast_hour,
             levels_t_so=self.LEVELS_T_SO,
@@ -46,13 +44,13 @@ class IconEuApiDownloader(Downloader):
         os.makedirs(output_folder, exist_ok=True)
 
         # Download files in parallel
-        print(f"Downloading {len(links)} files...")
+        logger.info(f"Downloading {len(links)} files...")
         make_parallel(
             func=self.get_file,  # Uses method from provided code
             items=links,
             download_folder=output_folder
         )
-        print("Downloading completed!")
+        logger.info("Downloading completed!")
 
         # Return list of downloaded files in the folder
         return [
@@ -79,7 +77,7 @@ class IconEuApiDownloader(Downloader):
 
             # Sprawdzenie, czy plik już istnieje
             if os.path.exists(file_path):
-                print(f"Plik już istnieje, pomijam pobieranie: {filename}")
+                logger.info(f"Plik już istnieje, pomijam pobieranie: {filename}")
                 return
 
             # Pobieranie pliku
@@ -91,10 +89,10 @@ class IconEuApiDownloader(Downloader):
                 for chunk in response.iter_content(chunk_size=8192):
                     file.write(chunk)
 
-            print(f"Pobrano: {filename}")
+            logger.info(f"Pobrano: {filename}")
 
         except requests.RequestException as e:
-            print(f"Nie można pobrać pliku z {url}: {e}")
+            logger.info(f"Nie można pobrać pliku z {url}: {e}")
 
     @staticmethod
     def generate_icon_links(date, hour, levels_t_so, levels_w_so, forecast_hours, base_url):
@@ -137,9 +135,10 @@ class IconEuApiDownloader(Downloader):
 
         return links
 
+
 if __name__ == "__main__":
     # Configurations
-    date = datetime.utcnow().strftime("%Y%m%d")  # Current date (YYYYMMDD format)
+    date = datetime.now(timezone.utc).strftime("%Y%m%d")  # Current date (YYYYMMDD format)
     forecast_hour = "03"  # Forecast hour ("00", "06", "12", "18" are typical values)
     output_directory = "./downloaded_files"
 
@@ -147,6 +146,6 @@ if __name__ == "__main__":
     downloader = IconEuApiDownloader()
     downloaded_files = downloader.get_data((output_directory, forecast_hour), date)
 
-    print("Downloaded and decompressed files:")
-    for file in downloaded_files:
-        print(file)
+    logger.info(f"Downloaded files:{downloaded_files}")
+    # for file in downloaded_files:
+    #     logger.info(file)

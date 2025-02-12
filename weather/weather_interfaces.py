@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from weather import weather_downloader, weather_extractor, weather_uploader
+from weather import weather_downloader, weather_extractor, weather_uploader, weather_transformer
 
 
 class HandlerWeatherFactory(ABC):
@@ -13,6 +13,11 @@ class HandlerWeatherFactory(ABC):
     @abstractmethod
     def get_extractor(self) -> weather_extractor.Extractor:
         ...
+
+    @abstractmethod
+    def get_transformer(self) -> weather_transformer.Transformer:
+        ...
+
 
     @abstractmethod
     def get_uploader(self) -> weather_uploader.Uploader:
