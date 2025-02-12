@@ -24,21 +24,14 @@ class IconEuApiDownloader(Downloader):
     FORECAST_HOURS = ["000", "003", "006", "009", "012", "015", "018", "021", "024",
                       "027", "030", "033", "036", "039", "042", "048"]
     BASE_URL = "https://opendata.dwd.de/weather/nwp/icon-eu/grib"
-    DOWNLOAD_FOLDER = "downloads"
-    OUTPUT_FOLDER = "processed_data"
 
     def get_data(self, id_geom: tuple, date: str) -> list:
         output_folder, forecast_hour = id_geom
 
         # Generate ICON-EU file URLs
-        links: list = self.generate_icon_links(
-            date=date,
-            hour=forecast_hour,
-            levels_t_so=self.LEVELS_T_SO,
-            levels_w_so=self.LEVELS_W_SO,
-            forecast_hours=self.FORECAST_HOURS,
-            base_url=self.BASE_URL,
-        )
+        links: list = self.generate_icon_links(curent_date=date, hour=forecast_hour, levels_t_so=self.LEVELS_T_SO,
+                                               levels_w_so=self.LEVELS_W_SO, forecast_hours=self.FORECAST_HOURS,
+                                               base_url=self.BASE_URL)
 
         # Create output directory if it doesn't exist
         os.makedirs(output_folder, exist_ok=True)
@@ -99,7 +92,7 @@ class IconEuApiDownloader(Downloader):
         """
         Generuje linki do pobierania plików modelu ICON-EU.
 
-        :param date: Data w formacie YYYYMMDD (np. "20240812").
+        :param curent_date: Data w formacie YYYYMMDD (np. "20240812").
         :param hour: Godzina prognozy (np. "12" - czas UTC).
         :param levels_t_so: Lista poziomów dla parametru t_so.
         :param levels_w_so: Lista poziomów dla parametru w_so.

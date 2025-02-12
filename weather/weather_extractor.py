@@ -29,7 +29,7 @@ class IconEuExtractor(Extractor):
 
         if not os.path.exists(file_path):
             logger.error(f"Plik {file_path} nie istnieje.")
-            return None  # Return None for a missing file
+            return None
 
         try:
             with bz2.BZ2File(file_path, 'rb') as compressed_file, open(output_file_path, 'wb') as decompressed_file:
