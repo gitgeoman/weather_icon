@@ -29,9 +29,14 @@ class IconEuApiDownloader(Downloader):
         output_folder, forecast_hour = id_geom
 
         # Generate ICON-EU file URLs
-        links: list = self.generate_icon_links(curent_date=date, hour=forecast_hour, levels_t_so=self.LEVELS_T_SO,
-                                               levels_w_so=self.LEVELS_W_SO, forecast_hours=self.FORECAST_HOURS,
-                                               base_url=self.BASE_URL)
+        links: list = self.generate_icon_links(
+            date=date,
+            hour=forecast_hour,
+            levels_t_so=self.LEVELS_T_SO,
+            levels_w_so=self.LEVELS_W_SO,
+            forecast_hours=self.FORECAST_HOURS,
+            base_url=self.BASE_URL,
+        )
 
         # Create output directory if it doesn't exist
         os.makedirs(output_folder, exist_ok=True)
@@ -92,7 +97,7 @@ class IconEuApiDownloader(Downloader):
         """
         Generuje linki do pobierania plików modelu ICON-EU.
 
-        :param curent_date: Data w formacie YYYYMMDD (np. "20240812").
+        :param date: Data w formacie YYYYMMDD (np. "20240812").
         :param hour: Godzina prognozy (np. "12" - czas UTC).
         :param levels_t_so: Lista poziomów dla parametru t_so.
         :param levels_w_so: Lista poziomów dla parametru w_so.
