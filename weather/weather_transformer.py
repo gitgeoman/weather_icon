@@ -6,11 +6,11 @@ import geopandas as gpd
 from shapely.geometry import Point
 import pandas as pd
 import time
+
 # Ścieżka do folderu z plikami GRIB2
 output_folder = "./downloaded_files"
 
-# Zbierz wszystkie pliki GRIB2
-downloaded_files = [
+downloaded_files: list = [
     os.path.join(output_folder, filename)
     for filename in os.listdir(output_folder)
     if filename.endswith(".grib2")
@@ -59,7 +59,7 @@ FORECAST_HOURS = ["000", "003",
 for hour in FORECAST_HOURS:
     all_dataframes = []
     hour_start_time = time.time()
-    for file_path in downloaded_files :
+    for file_path in downloaded_files:
         if hour in file_path:
 
             print(f"Przetwarzanie pliku GRIB2: {file_path}")
@@ -76,7 +76,6 @@ for hour in FORECAST_HOURS:
     # Usuń duplikaty w przypadku łączenia tych samych współrzędnych z różnymi parametrami
     combined_dataframe = combined_dataframe.groupby(['latitude', 'longitude'], as_index=False).first()
 
-    # Dodaj geometrię dla GeoDataFrame (konwersja do obiektu geopandas)
     gdf = gpd.GeoDataFrame(
         combined_dataframe,
         geometry=[
@@ -85,19 +84,14 @@ for hour in FORECAST_HOURS:
         crs="EPSG:4326"  # Standardowy układ współrzędnych WGS84
     )
 
-    # Wynikowy GeoDataFrame
     print(gdf.head())
 
-    # Zapis danych do jednego pliku, np. shapefile lub GeoJSON
+
     output_file = f"combined_grib_data_{hour}.fgb"
     gdf.to_file(output_file, driver="flatgeobuf")
     print(f"Połączone dane zapisano do pliku: {output_file}")
     hour_end_time = time.time()
     print(f"Time taken for forecast hour {hour}: {hour_end_time - hour_start_time:.2f} seconds\n")
 
-
 task_end_time = time.time()
 print(f"Total task duration: {task_end_time - task_start_time:.2f} seconds")
-
-
-
