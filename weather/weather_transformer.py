@@ -5,7 +5,7 @@ import pygrib
 import geopandas as gpd
 from shapely.geometry import Point
 import pandas as pd
-
+import time
 # Ścieżka do folderu z plikami GRIB2
 output_folder = "./downloaded_files"
 
@@ -52,36 +52,52 @@ def extract_grib_data(file_path):
 
 
 # Połącz dane ze wszystkich plików GRIB2
-all_dataframes = []
 
-for file_path in downloaded_files:
-    print(f"Przetwarzanie pliku GRIB2: {file_path}")
-    try:
-        # Ekstraktuj dane z pliku GRIB do DataFrame
-        df = extract_grib_data(file_path)
-        all_dataframes.append(df)
-    except Exception as e:
-        print(f"Błąd przetwarzania pliku {file_path}: {e}")
+task_start_time = time.time()
+FORECAST_HOURS = ["000", "003",
+                  "006"]  # , "009", "012", "015", "018", "021", "024", "027", "030", "033", "036", "039", "042", "048"]
+for hour in FORECAST_HOURS:
+    all_dataframes = []
+    hour_start_time = time.time()
+    for file_path in downloaded_files :
+        if hour in file_path:
 
-# Połącz wszystkie DataFrame w jeden
-combined_dataframe = pd.concat(all_dataframes, ignore_index=True)
+            print(f"Przetwarzanie pliku GRIB2: {file_path}")
+            try:
+                # Ekstraktuj dane z pliku GRIB do DataFrame
+                df = extract_grib_data(file_path)
+                all_dataframes.append(df)
+            except Exception as e:
+                print(f"Błąd przetwarzania pliku {file_path}: {e}")
 
-# Usuń duplikaty w przypadku łączenia tych samych współrzędnych z różnymi parametrami
-combined_dataframe = combined_dataframe.groupby(['latitude', 'longitude'], as_index=False).first()
+    # Połącz wszystkie DataFrame w jeden
+    combined_dataframe = pd.concat(all_dataframes, ignore_index=True)
 
-# Dodaj geometrię dla GeoDataFrame (konwersja do obiektu geopandas)
-gdf = gpd.GeoDataFrame(
-    combined_dataframe,
-    geometry=[
-        Point(lon, lat) for lon, lat in zip(combined_dataframe["longitude"], combined_dataframe["latitude"])
-    ],
-    crs="EPSG:4326"  # Standardowy układ współrzędnych WGS84
-)
+    # Usuń duplikaty w przypadku łączenia tych samych współrzędnych z różnymi parametrami
+    combined_dataframe = combined_dataframe.groupby(['latitude', 'longitude'], as_index=False).first()
 
-# Wynikowy GeoDataFrame
-print(gdf.head())
+    # Dodaj geometrię dla GeoDataFrame (konwersja do obiektu geopandas)
+    gdf = gpd.GeoDataFrame(
+        combined_dataframe,
+        geometry=[
+            Point(lon, lat) for lon, lat in zip(combined_dataframe["longitude"], combined_dataframe["latitude"])
+        ],
+        crs="EPSG:4326"  # Standardowy układ współrzędnych WGS84
+    )
 
-# Zapis danych do jednego pliku, np. shapefile lub GeoJSON
-output_file = "combined_grib_data.fgb"
-gdf.to_file(output_file, driver="flatgeobuf")
-print(f"Połączone dane zapisano do pliku: {output_file}")
+    # Wynikowy GeoDataFrame
+    print(gdf.head())
+
+    # Zapis danych do jednego pliku, np. shapefile lub GeoJSON
+    output_file = f"combined_grib_data_{hour}.fgb"
+    gdf.to_file(output_file, driver="flatgeobuf")
+    print(f"Połączone dane zapisano do pliku: {output_file}")
+    hour_end_time = time.time()
+    print(f"Time taken for forecast hour {hour}: {hour_end_time - hour_start_time:.2f} seconds\n")
+
+
+task_end_time = time.time()
+print(f"Total task duration: {task_end_time - task_start_time:.2f} seconds")
+
+
+

@@ -37,26 +37,16 @@ class IconEuExtractor(Extractor):
 
 
 if __name__ == "__main__":
-    # --------------------------- DOWNLOAD -------------------------------
-    from weather_downloader import IconEuApiDownloader
-
-    date = datetime.now(timezone.utc).strftime("%Y%m%d")  # Current date (YYYYMMDD format)
-    forecast_hour = "00"  # Forecast hour ("00", "06", "12", "18" are typical values)
-    output_directory = "./downloaded_files"
-
-    os.makedirs(output_directory, exist_ok=True)
-
-    downloader = IconEuApiDownloader()
-    downloaded_files: list = downloader.get_data((output_directory, forecast_hour), date)
-
-    logger.info(f"Downloaded files: {downloaded_files}")
-
+    output_folder = "./downloaded_files"
+    downloaded_files = [os.path.join(output_folder, filename)
+        for filename in os.listdir(output_folder) if filename.endswith(".bz2")]
+    print(downloaded_files)
     # --------------------------- EXTRACT  -------------------------------
     extractor = IconEuExtractor()
     logger.info(f"Rozpakowywanie {len(downloaded_files)} plików .bz2...")
 
     decompressed_files = [
-        result for result in make_parallel(extractor.extract, downloaded_files, output_directory=output_directory)
+        result for result in make_parallel(extractor.extract, downloaded_files, output_directory=output_folder)
         if result is not None
     ]
 
