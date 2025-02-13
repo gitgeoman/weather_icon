@@ -45,16 +45,20 @@ class IconEuTransformer(Transformer):
 
                     print(f"Przetwarzanie pliku GRIB2: {file_path}")
                     try:
-                        # Ekstraktuj dane z pliku GRIB do DataFrame
-                        df = self.tranform_single_file(file_path)
+                        # Corrected function name
+                        df = self.transform_single_file(file_path)
                         all_dataframes.append(df)
                     except Exception as e:
                         print(f"Błąd przetwarzania pliku {file_path}: {e}")
 
-            # Połącz wszystkie DataFrame w jeden
+            if not all_dataframes:
+                print(f"No valid data to process for hour {hour}")
+                continue  # Skip this hour if no files were processed successfully
+
+            # Combine all DataFrame objects into one
             combined_dataframe = pd.concat(all_dataframes, ignore_index=True)
 
-            # Usuń duplikaty w przypadku łączenia tych samych współrzędnych z różnymi parametrami
+            # Remove duplicates in case of merging the same coordinates with different parameters
             combined_dataframe = combined_dataframe.groupby(['latitude', 'longitude'], as_index=False).first()
 
             gdf = gpd.GeoDataFrame(
@@ -62,50 +66,55 @@ class IconEuTransformer(Transformer):
                 geometry=[
                     Point(lon, lat) for lon, lat in zip(combined_dataframe["longitude"], combined_dataframe["latitude"])
                 ],
-                crs="EPSG:4326"  # Standardowy układ współrzędnych WGS84
+                crs="EPSG:4326"  # Standard coordinate reference system WGS84
             )
 
             print(gdf.head())
 
             output_file = f"combined_grib_data_{hour}.fgb"
             gdf.to_file(output_file, driver="flatgeobuf")
-            print(f"Połączone dane zapisano do pliku: {output_file}")
+            print(f"Combined data saved to file: {output_file}")
             hour_end_time = time.time()
             print(f"Time taken for forecast hour {hour}: {hour_end_time - hour_start_time:.2f} seconds\n")
 
         task_end_time = time.time()
         print(f"Total task duration: {task_end_time - task_start_time:.2f} seconds")
 
-    def tranform_single_file(self, file_path):
+    def transform_single_file(self, file_path):  # Corrected function name
         data_records = []
 
-        # Otwórz plik GRIB
+        # Function to process GRIB messages
+        def process_grib_message(grb):
+            lats, lons = grb.latlons()
+            values = grb.values
+            parameter_name = grb.parameterName
+            validity_datetime = datetime.strptime(
+                f"{grb.validityDate:08d}{grb.validityTime:04d}", "%Y%m%d%H%M"
+            )
+            return [
+                {
+                    "latitude": lat,
+                    "longitude": lon,
+                    parameter_name: value,
+                    "update_on": validity_datetime,
+                }
+                for lat, lon, value in zip(lats.flatten(), lons.flatten(), values.flatten())
+            ]
+
+        # Open the GRIB file
         with pygrib.open(file_path) as grbs:
-            # Iteruj przez wszystkie wiadomości (messages) w pliku GRIB
-            for grb in grbs:
-                # Pobierz dane geograficzne i wartości
-                lats, lons = grb.latlons()  # Pobierz szerokość i długość geograficzną
-                values = grb.values  # Pobierz wartości parametrów (np. temperatury, wiatru)
+            # Parallel processing
+            grib_messages = list(grbs)
+            results = make_parallel(process_grib_message, grib_messages)
 
-                # Pobierz nazwę parametru (np. "temperature", "wind speed" itd.)
-                parameter_name = grb.parameterName
+        # Flatten the collective results
+        data_records = [record for result in results for record in result]
 
-                # Konwertuj dane geograficzne + dane parametru do rekordów
-                for lat, lon, value in zip(lats.flatten(), lons.flatten(), values.flatten()):
-                    data_records.append({
-                        "latitude": lat,
-                        "longitude": lon,
-                        parameter_name: value,  # dynamicznie dodajemy parametr jako nazwę kolumny
-                        'update_on': datetime.strptime(
-                            f"{grb.validityDate:08d}{grb.validityTime:04d}", "%Y%m%d%H%M"
-                        )
-                    })
-
-        # Konwertuj listę rekordów do Pandas DataFrame
+        # Convert the list of records to a Pandas DataFrame
         return pd.DataFrame(data_records)
 
 
 if __name__ == "__main__":
     # --------------------------- Transform  -------------------------------
-    tranformer = IconEuTransformer()
-    tranformer.get_transform()
+    transformer = IconEuTransformer()  # Corrected variable name
+    transformer.get_transform()
