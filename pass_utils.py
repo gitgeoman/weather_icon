@@ -15,7 +15,7 @@ from pass_logging import logger
 
 
 def make_parallel(
-        func: Callable, items: list, workers: int = os.cpu_count() * 2, **kwargs
+        func: Callable, items: list, workers: int = os.cpu_count() * 2, **kwargs: object
 ) -> list:
     """przetwarzanie listy  z ThreadPoolExecutor"""
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
