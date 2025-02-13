@@ -14,7 +14,7 @@ from pass_utils import make_parallel
 
 class Extractor(ABC):
     @abstractmethod
-    def extract(self, file_path, output_directory) -> pd.DataFrame:
+    def extract(self) -> pd.DataFrame:
         """Extract method varies depending on weather source"""
         ...
 
@@ -22,9 +22,18 @@ class Extractor(ABC):
 class IconEuExtractor(Extractor):
     """Extractor for ICON-EU GRIB2 files."""
 
-    def extract(self, file_path, output_directory):
+    output_folder: str = "./downloaded_files"
+
+    def extract(self):
+        file_paths: list = [os.path.join(self.output_folder, filename)
+                            for filename in os.listdir(self.output_folder) if filename.endswith(".bz2")]
+        logger.info(f"Rozpakowywanie {len(file_paths)} plików .bz2...")
+        make_parallel(self.extract_single_file, items=file_paths, )
+        logger.info("Rozpakowywanie zakończone!")
+
+    def extract_single_file(self, file_path):
         """Extracts a single file and returns its decompressed path."""
-        output_file_path = os.path.join(output_directory, os.path.basename(file_path)[:-4])
+        output_file_path = os.path.join(self.output_folder, os.path.basename(file_path)[:-4])
 
         try:
             with bz2.BZ2File(file_path, 'rb') as compressed_file, open(output_file_path, 'wb') as decompressed_file:
@@ -37,18 +46,6 @@ class IconEuExtractor(Extractor):
 
 
 if __name__ == "__main__":
-    output_folder = "./downloaded_files"
-    downloaded_files = [os.path.join(output_folder, filename)
-        for filename in os.listdir(output_folder) if filename.endswith(".bz2")]
-    print(downloaded_files)
     # --------------------------- EXTRACT  -------------------------------
     extractor = IconEuExtractor()
-    logger.info(f"Rozpakowywanie {len(downloaded_files)} plików .bz2...")
-
-    decompressed_files = [
-        result for result in make_parallel(extractor.extract, downloaded_files, output_directory=output_folder)
-        if result is not None
-    ]
-
-    logger.info("Rozpakowywanie zakończone!")
-    logger.info(f"Rozpakowane pliki: {decompressed_files}")
+    extractor.extract()

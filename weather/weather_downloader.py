@@ -27,7 +27,7 @@ class IconEuApiDownloader(Downloader):
     # FORECAST_HOURS = ["000", "003", "006", "009", "012", "015", "018", "021", "024", "027", "030", "033", "036", "039",
     # "042", "048"] # TODO uncomment after tests
     BASE_URL = "https://opendata.dwd.de/weather/nwp/icon-eu/grib"
-    DOWNLOAD_FOLDER_ICON = "./downloaded_files"
+    DOWNLOAD_FOLDER_ICON = "./file_paths"
 
     def get_data(self) -> list:
 
