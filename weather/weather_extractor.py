@@ -1,12 +1,6 @@
 import bz2
 import os
-
-import pandas as pd
-
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-
-import pygrib
 
 from pass_logging import logger
 from pass_utils import make_parallel
@@ -14,7 +8,7 @@ from pass_utils import make_parallel
 
 class Extractor(ABC):
     @abstractmethod
-    def extract(self) -> pd.DataFrame:
+    def extract(self) -> None:
         """Extract method varies depending on weather source"""
         ...
 
@@ -22,30 +16,41 @@ class Extractor(ABC):
 class IconEuExtractor(Extractor):
     """Extractor for ICON-EU GRIB2 files."""
 
-    output_folder: str = "./downloaded_files"
+    def __init__(self, output_folder: str = "./downloaded_files"):
+        self.output_folder: str = output_folder
 
     def extract(self):
-        file_paths: list = [os.path.join(self.output_folder, filename)
+
+        file_paths: list[str] = [os.path.join(self.output_folder, filename)
                             for filename in os.listdir(self.output_folder) if filename.endswith(".bz2")]
-        logger.info(f"Rozpakowywanie {len(file_paths)} plików .bz2...")
+        if not file_paths:
+            logger.warning("Brak plików .bz2 w katalogu.")
+            return
         make_parallel(self.extract_single_file, items=file_paths, )
         logger.info("Rozpakowywanie zakończone!")
 
-    def extract_single_file(self, file_path):
+    def extract_single_file(self, file_path: str) -> str | None:
         """Extracts a single file and returns its decompressed path."""
-        output_file_path = os.path.join(self.output_folder, os.path.basename(file_path)[:-4])
+        output_file_path = os.path.join(self.output_folder, os.path.splitext(os.path.basename(file_path))[0])
+
+        if os.path.exists(output_file_path):
+            logger.info(f"Plik już rozpakowany: {output_file_path}")
+            return output_file_path
 
         try:
             with bz2.BZ2File(file_path, 'rb') as compressed_file, open(output_file_path, 'wb') as decompressed_file:
                 decompressed_file.write(compressed_file.read())
             logger.info(f"Rozpakowano: {output_file_path}")
             return output_file_path
-        except Exception as e:
+
+        except (IOError, OSError, bz2.BZ2File) as e:
             logger.error(f"Błąd podczas rozpakowywania pliku {file_path}: {e}", exc_info=True)
             return None
 
 
-if __name__ == "__main__":
-    # --------------------------- EXTRACT  -------------------------------
+def main() -> None:
     extractor = IconEuExtractor()
     extractor.extract()
+
+if __name__ == "__main__":
+    main()
