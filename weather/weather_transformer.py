@@ -35,8 +35,9 @@ class IconEuTransformer(Transformer):
             if filename.endswith(".grib2")
         ]
         task_start_time = time.time()
-        FORECAST_HOURS = ["000", "003",
-                          "006"]  # , "009", "012", "015", "018", "021", "024", "027", "030", "033", "036", "039", "042", "048"]
+        # FORECAST_HOURS = ["000", "003", "006"] # TODO comment after tests
+        FORECAST_HOURS = ["000", "003", "006", "009", "012", "015", "018", "021", "024", "027", "030", "033", "036",
+                          "039", "042", "048"]  # TODO uncomment after tests
         for hour in FORECAST_HOURS:
             all_dataframes = []
             hour_start_time = time.time()
