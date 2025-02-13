@@ -92,9 +92,6 @@ class IconEuApiDownloader(Downloader):
     def generate_icon_links(date, hour, levels_t_so, levels_w_so, forecast_hours, base_url):
         links = []
 
-
-
-        # Słownik mapujący typ danych na odpowiednie poziomy i format linków
         file_patterns = {
             "t_so": {"levels": levels_t_so, "path": "soil-level", "suffix": "T_SO"},
             "w_so": {"levels": levels_w_so, "path": "soil-level", "suffix": "W_SO"},
