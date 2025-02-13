@@ -17,7 +17,12 @@ class Downloader(ABC):
 
 
 class IconEuApiDownloader(Downloader):
-    """Downloader for ICON-EU weather model data."""
+    """Downloader for ICON-EU weather model data.
+        # - `"t_so"`: Reprezentuje dane dotyczące temperatury profilu gleby.
+        # - `"w_so"`: Dane dotyczące wilgotności profilu gleby.
+        # - `"t_2m"`: Temperatura na wysokości 2 metrów nad powierzchnią ziemi.
+        # - `"tot_prec"`: Całkowita suma opadów.
+    """
     # config
     DATE = datetime.now(timezone.utc).strftime("%Y%m%d")
     LEVELS_T_SO = [0, ]  # 2, 5, 6, 18, 54, 162]
@@ -87,10 +92,7 @@ class IconEuApiDownloader(Downloader):
     def generate_icon_links(date, hour, levels_t_so, levels_w_so, forecast_hours, base_url):
         links = []
 
-        # - `"t_so"`: Reprezentuje dane dotyczące temperatury profilu gleby.
-        # - `"w_so"`: Dane dotyczące wilgotności profilu gleby.
-        # - `"t_2m"`: Temperatura na wysokości 2 metrów nad powierzchnią ziemi.
-        # - `"tot_prec"`: Całkowita suma opadów.
+
 
         # Słownik mapujący typ danych na odpowiednie poziomy i format linków
         file_patterns = {
@@ -114,6 +116,5 @@ class IconEuApiDownloader(Downloader):
 
 
 if __name__ == "__main__":
-    # Use the downloader
     downloader = IconEuApiDownloader()
     downloaded_files = downloader.get_data()
