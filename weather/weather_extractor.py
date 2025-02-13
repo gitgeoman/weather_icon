@@ -41,7 +41,7 @@ if __name__ == "__main__":
     from weather_downloader import IconEuApiDownloader
 
     date = datetime.now(timezone.utc).strftime("%Y%m%d")  # Current date (YYYYMMDD format)
-    forecast_hour = "03"  # Forecast hour ("00", "06", "12", "18" are typical values)
+    forecast_hour = "00"  # Forecast hour ("00", "06", "12", "18" are typical values)
     output_directory = "./downloaded_files"
 
     os.makedirs(output_directory, exist_ok=True)

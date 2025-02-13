@@ -21,8 +21,7 @@ class IconEuApiDownloader(Downloader):
     # Stałe globalne
     LEVELS_T_SO = [0, ]  # 2, 5, 6, 18, 54, 162]
     LEVELS_W_SO = [0, ]  # 1, 3, 9, 27, 81, 243]
-    FORECAST_HOURS = ["000", "003", "006", "009", "012", "015", "018", "021", "024",
-                      "027", "030", "033", "036", "039", "042", "048"]
+    FORECAST_HOURS = ["000","003", "006"]#, "009", "012", "015", "018", "021", "024", "027", "030", "033", "036", "039", "042", "048"]
     BASE_URL = "https://opendata.dwd.de/weather/nwp/icon-eu/grib"
 
     def get_data(self, id_geom: tuple, date: str) -> list:
@@ -137,7 +136,7 @@ class IconEuApiDownloader(Downloader):
 if __name__ == "__main__":
     # Configurations
     date = datetime.now(timezone.utc).strftime("%Y%m%d")  # Current date (YYYYMMDD format)
-    forecast_hour = "03"  # Forecast hour ("00", "06", "12", "18" are typical values)
+    forecast_hour = "00"  # Forecast hour ("00", "06", "12", "18" are typical values)
     output_directory = "./downloaded_files"
 
     # Use the downloader
