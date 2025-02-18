@@ -20,7 +20,7 @@ pd.set_option('display.width', 1000)
 
 class Transformer(ABC):
     @abstractmethod
-    def get_transform(self):
+    def transform_data(self):
         """transform method varies depending on weather source"""
         ...
 
@@ -29,7 +29,7 @@ class IconEuTransformer(Transformer):
     output_folder = "./downloaded_files"
     temp_folder = "./tmp"
 
-    def get_transform(self):
+    def transform_data(self):
         downloaded_files: list = [
             os.path.join(self.output_folder, filename)
             for filename in os.listdir(self.output_folder)
@@ -122,4 +122,4 @@ class IconEuTransformer(Transformer):
 if __name__ == "__main__":
     # --------------------------- Transform  -------------------------------
     transformer = IconEuTransformer()  # Corrected variable name
-    transformer.get_transform()
+    transformer.transform_data()

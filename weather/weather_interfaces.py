@@ -23,7 +23,7 @@ class HandlerWeatherFactory(ABC):
         ...
 
 
-class IconEuWeatherFactory(HandlerWeatherFactory):
+class HandlerIconEuWeather(HandlerWeatherFactory):
     """Factory for handling ICON-EU weather data."""
 
     def get_downloader(self) -> weather_downloader.Downloader:
@@ -36,4 +36,5 @@ class IconEuWeatherFactory(HandlerWeatherFactory):
         return weather_transformer.IconEuTransformer()
 
     def get_uploader(self) -> weather_uploader.Uploader:
-        return weather_uploader.DBUploader()
+        return weather_uploader.IconEUDBUploader()
+
