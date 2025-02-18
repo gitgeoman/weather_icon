@@ -11,12 +11,6 @@ from shapely.geometry import Point
 
 from pass_logging import logger
 
-db_name: str = 'mapservice'
-db_user: str = 'mapservice'
-db_password: str = 'mapservice'
-db_port: str = '55432'
-db_host: str = 'localhost'
-
 
 def connect_to_db(db_name: str, db_user: str, db_password: str, db_port: str, db_host: str) -> sqlalchemy.Engine:
     return create_engine(f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}")
