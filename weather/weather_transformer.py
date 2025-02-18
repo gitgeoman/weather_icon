@@ -27,6 +27,7 @@ class Transformer(ABC):
 
 class IconEuTransformer(Transformer):
     output_folder = "./downloaded_files"
+    temp_folder = "./tmp"
 
     def get_transform(self):
         downloaded_files: list = [
@@ -62,18 +63,21 @@ class IconEuTransformer(Transformer):
             # Remove duplicates in case of merging the same coordinates with different parameters
             combined_dataframe = combined_dataframe.groupby(['latitude', 'longitude'], as_index=False).first()
 
+            combined_dataframe["geometry"] = combined_dataframe.apply(lambda row: Point(row["longitude"], row["latitude"]), axis=1)
             gdf = gpd.GeoDataFrame(
                 combined_dataframe,
-                geometry=[
-                    Point(lon, lat) for lon, lat in zip(combined_dataframe["longitude"], combined_dataframe["latitude"])
-                ],
-                crs="EPSG:4326"  # Standard coordinate reference system WGS84
+                geometry="geometry",
+                crs="EPSG:4326"
             )
 
             print(gdf.head())
 
-            output_file = f"combined_grib_data_{hour}.fgb"
+            if not os.path.exists(self.temp_folder):
+                os.makedirs(self.temp_folder)
+            output_file = os.path.join(self.temp_folder, f"combined_grib_data_{hour}.fgb")
             gdf.to_file(output_file, driver="flatgeobuf")
+
+
             print(f"Combined data saved to file: {output_file}")
             hour_end_time = time.time()
             print(f"Time taken for forecast hour {hour}: {hour_end_time - hour_start_time:.2f} seconds\n")
