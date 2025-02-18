@@ -16,8 +16,8 @@ class Extractor(ABC):
 class IconEuExtractor(Extractor):
     """Extractor for ICON-EU GRIB2 files."""
 
-    def __init__(self, output_folder: str = "./downloaded_files"):
-        self.output_folder: str = output_folder
+    def __init__(self, config):
+        self.output_folder: str = config["DOWNLOAD_FOLDER_ICON"]
 
     def extract(self):
 

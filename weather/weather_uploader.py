@@ -30,7 +30,9 @@ class Uploader(ABC):
 
 
 class IconEUDBUploader(Uploader):
-    temp_folder = "./tmp"
+    def __init__(self, config):
+        self.output_folder = config["DOWNLOAD_FOLDER_ICON"]
+        self.temp_folder = config["TMP_FOLDER"]
 
     """Uploader for database."""
 

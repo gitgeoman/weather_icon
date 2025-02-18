@@ -38,7 +38,8 @@ class FactoryWeatherICONToday(WeatherArea):
                 "000", "003", "006", "009", "012", "015", "018", "021", "024"
             ],
             'BASE_URL': "https://opendata.dwd.de/weather/nwp/icon-eu/grib",
-            'DOWNLOAD_FOLDER_ICON': "./downloaded_files"
+            'DOWNLOAD_FOLDER_ICON': "./downloaded_files",
+            'TMP_FOLDER': './tmp'
         }
         handler = weather_interfaces.HandlerIconEuWeather()
 

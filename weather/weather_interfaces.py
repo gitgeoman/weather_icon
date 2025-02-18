@@ -30,10 +30,10 @@ class HandlerIconEuWeather(HandlerWeatherFactory):
         return weather_downloader.IconEuApiDownloader(config=kwargs["config"])
 
     def get_extractor(self, **kwargs) -> weather_extractor.Extractor:
-        return weather_extractor.IconEuExtractor()
+        return weather_extractor.IconEuExtractor(config=kwargs["config"])
 
     def get_transformer(self, **kwargs) -> weather_transformer.Transformer:
-        return weather_transformer.IconEuTransformer()
+        return weather_transformer.IconEuTransformer(config=kwargs["config"])
 
     def get_uploader(self, **kwargs) -> weather_uploader.Uploader:
-        return weather_uploader.IconEUDBUploader()
+        return weather_uploader.IconEUDBUploader(config=kwargs["config"])

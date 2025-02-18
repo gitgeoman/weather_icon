@@ -26,8 +26,10 @@ class Transformer(ABC):
 
 
 class IconEuTransformer(Transformer):
-    output_folder = "./downloaded_files"
-    temp_folder = "./tmp"
+
+    def __init__(self, config):
+        self.output_folder = config["DOWNLOAD_FOLDER_ICON"]
+        self.temp_folder = config["TMP_FOLDER"]
 
     def transform_data(self):
         downloaded_files: list = [
