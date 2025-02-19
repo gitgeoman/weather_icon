@@ -1,6 +1,5 @@
 import os
 
-import pandas as pd
 import requests
 from abc import ABC, abstractmethod
 from dotenv import load_dotenv
@@ -58,38 +57,15 @@ class OpenWeatherApiDownloader(Downloader):
     def __init__(self, config):
         self.picker = RandomKeyPicker(config["API_KEYS"])
         self.url_elem: str = config["URL_ELEM"]
+        self.tmp_df = config["TMP_DF"]
 
     def get_data(self):
-        downloaded: list[str] = make_parallel(
+        self.tmp_df: list[str] = make_parallel(
             func=self.get_single_coords,
             items=[(row.id, row.geom) for index, row in get_centroids(self.db_connection).head(2).iterrows()],
-            # TODO UNLOCK
+            # TODO UNLOCK FOR EVERY ITEM
             url_elem=self.url_elem
-        )
-        id_pt, data = downloaded[0]
-        df = pd.DataFrame([{
-            'id_geom': id_pt,
-            'temp': data['main']['temp'],
-            'temp_max': data['main']['temp_max'],
-            'temp_min': data['main']['temp_min'],
-            'feels_like': data['main']['feels_like'],
-            'pressure': data['main']['pressure'],
-            'humidity': data['main']['humidity'],
-            'clouds': data['clouds']['all'],
-            'weather_id': data['weather'][0]['id'],
-            'weather_type': data['weather'][0]['main'],
-            'weather_desc': data['weather'][0]['description'],
-            'weather_icon': data['weather'][0]['icon'],
-            'visibility': data['visibility'],
-            'country': data['sys']['country'],
-            'city': data['name'],
-            "precip_type": "rain" if 'rain' in data else ("snow" if 'snow' in data else "no"),
-            "precip_value": data['rain']['1h'] if 'rain' in data else (data['snow']['1h'] if 'snow' in data else 0),
-            "update_time": datetime.now(),
-            **data['wind'],
-            **data['coord']
-        }])
-        df.to_sql(name='weather_OW', schema='weather_ow', con=self.db_connection, if_exists='append', index=False)
+        )[0]
 
     def get_single_coords(self, id_geom, url_elem):
         id_pt, geom = id_geom

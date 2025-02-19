@@ -21,6 +21,15 @@ class Transformer(ABC):
         ...
 
 
+class OpenWeatherApiTransformer(Transformer):
+
+    def __init__(self, config):
+        pass
+
+    def transform_data(self):
+        pass
+
+
 class IconEuTransformer(Transformer):
 
     def __init__(self, config):
@@ -29,7 +38,6 @@ class IconEuTransformer(Transformer):
         self.day = config["DATE"]
         self.FORECAST_HOURS = config["FORECAST_HOURS"]
         self.area = config["AREA"]
-
 
     def transform_data(self):
         downloaded_files: list = [
@@ -71,11 +79,10 @@ class IconEuTransformer(Transformer):
                 os.makedirs(self.temp_folder)
             output_file = os.path.join(self.temp_folder, f"combined_grib_data_{self.day}_{hour}.fgb")
             if os.path.exists(output_file):
-                os.remove(output_file) # rm if exist
+                os.remove(output_file)  # rm if exist
             gdf.to_file(output_file, driver="flatgeobuf")
 
             logger.info(f"Combined data saved to file: {output_file}")
-
 
     def transform_single_file(self, file_path):
 
@@ -110,10 +117,11 @@ class IconEuTransformer(Transformer):
             grib_messages = list(grbs)
             results = make_parallel(process_grib_message, grib_messages)
 
-        data_records = [record for result in results for record in result] #splaszczania do df
+        data_records = [record for result in results for record in result]  # splaszczania do df
 
         return pd.DataFrame(data_records)
 
 
 if __name__ == "__main__":
     pass
+
