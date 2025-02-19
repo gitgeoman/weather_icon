@@ -23,4 +23,4 @@ def handle_ow_weather_forecast() -> None:
 
 
 if __name__ == "__main__":
-    handle_ow_weather_today()
+    handle_icon_weather_today()

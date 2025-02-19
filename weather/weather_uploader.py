@@ -18,7 +18,7 @@ db_host: str = os.getenv('DB_HOST')
 
 class Uploader(ABC):
     @abstractmethod
-    def upload_data(self) -> None:
+    def run(self) -> None:
         """upload method for db"""
         ...
 
@@ -29,7 +29,7 @@ class OpenWeatherApiUploader(Uploader):
         self.table_name = config['URL_ELEM']
         self.db_connection = connect_to_db(db_name, db_user, db_password, db_port, db_host)
 
-    def upload_data(self) -> None:
+    def run(self) -> None:
         self.config['TMP_DF'].to_sql(
             name=f'OW_{self.table_name}',
             schema='weather_ow',
@@ -47,7 +47,7 @@ class IconEUDBUploader(Uploader):
 
     """Uploader for database."""
 
-    def upload_data(self) -> None:
+    def run(self) -> None:
         """Uploads data to database."""
 
         for file in [

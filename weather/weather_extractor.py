@@ -11,7 +11,7 @@ from pass_utils import make_parallel
 
 class Extractor(ABC):
     @abstractmethod
-    def extract(self) -> None:
+    def run(self) -> None:
         """Extract method varies depending on weather source"""
         ...
 
@@ -21,7 +21,7 @@ class OpenWeatherApiExtractorToday(Extractor):
         self.config = config  # Store the config as an instance variable
         self.tmp_df = self.config['TMP_DF']
 
-    def extract(self):
+    def run(self):
         id_pt, data = self.tmp_df[0]
 
         self.config['TMP_DF'] = pd.DataFrame([{
@@ -53,7 +53,7 @@ class OpenWeatherApiExtractorForecast(Extractor):
         self.config = config  # Store the config as an instance variable
         self.tmp_df = self.config['TMP_DF']
 
-    def extract(self):
+    def run(self):
         id_pt, data = self.tmp_df[0]
         weather_list = data["list"]
         name = data["city"]["name"]
@@ -84,7 +84,7 @@ class IconEuExtractor(Extractor):
     def __init__(self, config):
         self.output_folder: str = config["DOWNLOAD_FOLDER_ICON"]
 
-    def extract(self):
+    def run(self):
 
         file_paths: list[str] = [os.path.join(self.output_folder, filename)
                                  for filename in os.listdir(self.output_folder) if filename.endswith(".bz2")]
@@ -109,7 +109,7 @@ class IconEuExtractor(Extractor):
             logger.info(f"Rozpakowano: {output_file_path}")
             return output_file_path
 
-        except (IOError, OSError, bz2.BZ2File) as e:
+        except (IOError, OSError) as e:  # Corrected exception
             logger.error(f"Błąd podczas rozpakowywania pliku {file_path}: {e}", exc_info=True)
             return None
 

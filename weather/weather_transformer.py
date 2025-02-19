@@ -16,7 +16,7 @@ pd.set_option('display.width', 1000)
 
 class Transformer(ABC):
     @abstractmethod
-    def transform_data(self):
+    def run(self):
         """transform method varies depending on weather source"""
         ...
 
@@ -26,7 +26,7 @@ class OpenWeatherApiTransformer(Transformer):
     def __init__(self, config):
         pass
 
-    def transform_data(self):
+    def run(self):
         pass
 
 
@@ -39,7 +39,7 @@ class IconEuTransformer(Transformer):
         self.FORECAST_HOURS = config["FORECAST_HOURS"]
         self.area = config["AREA"]
 
-    def transform_data(self):
+    def run(self):
         downloaded_files: list = [
             os.path.join(self.output_folder, filename)
             for filename in os.listdir(self.output_folder)

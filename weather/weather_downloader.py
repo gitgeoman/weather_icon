@@ -13,38 +13,18 @@ db_user: str = os.getenv('DB_USER')
 db_password: str = os.getenv('DB_PASSWORD')
 db_port: str = os.getenv('DB_PORT')
 db_host: str = os.getenv('DB_HOST')
-WEATHER_API_KEY_1: str = os.getenv('WEATHER_API_KEY_1')
-WEATHER_API_KEY_2: str = os.getenv('WEATHER_API_KEY_2')
-WEATHER_API_KEY_3: str = os.getenv('WEATHER_API_KEY_3')
-WEATHER_API_KEY_4: str = os.getenv('WEATHER_API_KEY_4')
-WEATHER_API_KEY_5: str = os.getenv('WEATHER_API_KEY_5')
-WEATHER_API_KEY_6: str = os.getenv('WEATHER_API_KEY_6')
-WEATHER_API_KEY_7: str = os.getenv('WEATHER_API_KEY_7')
-WEATHER_API_KEY_8: str = os.getenv('WEATHER_API_KEY_8')
-WEATHER_API_KEY_9: str = os.getenv('WEATHER_API_KEY_9')
-WEATHER_API_KEY_10: str = os.getenv('WEATHER_API_KEY_10')
-WEATHER_API_KEY_11: str = os.getenv('WEATHER_API_KEY_11')
-WEATHER_API_KEY_12: str = os.getenv('WEATHER_API_KEY_12')
 
-WEATHER_API_KEYS: list = [
-    # WEATHER_API_KEY_1,
-    WEATHER_API_KEY_2,
-    WEATHER_API_KEY_3,
-    WEATHER_API_KEY_4,
-    WEATHER_API_KEY_5,
-    WEATHER_API_KEY_6,
-    WEATHER_API_KEY_7,
-    WEATHER_API_KEY_8,
-    WEATHER_API_KEY_9,
-    WEATHER_API_KEY_10,
-    WEATHER_API_KEY_11,
-    WEATHER_API_KEY_12,
-]
+
+def load_api_keys(prefix: str = "WEATHER_API_KEY_", count: int = 12) -> list:
+    return [os.getenv(f"{prefix}{i}") for i in range(1, count + 1)]
+
+WEATHER_API_KEYS = load_api_keys()
+
 
 
 class Downloader(ABC):
     @abstractmethod
-    def get_data(self) -> list:
+    def run(self) -> list:
         """Download method varies depending on weather source"""
         ...
 
@@ -57,7 +37,7 @@ class OpenWeatherApiDownloader(Downloader):
         self.url_elem: str = config["URL_ELEM"]
         self.tmp_df = config["TMP_DF"]
 
-    def get_data(self):
+    def run(self):
         self.tmp_df.extend(
             make_parallel(
                 func=self.get_single_coords,
@@ -95,7 +75,7 @@ class IconEuApiDownloader(Downloader):
         self.BASE_URL = config["BASE_URL"]
         self.DOWNLOAD_FOLDER_ICON = config["DOWNLOAD_FOLDER_ICON"]
 
-    def get_data(self):
+    def run(self):
 
         links: list = self.generate_icon_links(
             date=self.DATE,
@@ -164,4 +144,4 @@ class IconEuApiDownloader(Downloader):
 
 if __name__ == "__main__":
     downloader = OpenWeatherApiDownloader(config={"URL_ELEM": "weather", "API_KEYS": WEATHER_API_KEYS})
-    print(downloader.get_data())
+    print(downloader.run())
