@@ -1,5 +1,5 @@
 import os
-
+import pandas as pd
 import geopandas as gpd
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -10,6 +10,8 @@ from pass_logging import logger
 from dotenv import load_dotenv
 import os
 
+from pass_utils import connect_to_db
+
 load_dotenv('../.env')
 
 db_name: str = os.getenv('DB_NAME')
@@ -18,15 +20,27 @@ db_password: str = os.getenv('DB_PASSWORD')
 db_port: str = os.getenv('DB_PORT')
 db_host: str = os.getenv('DB_HOST')
 
-def connect_to_db(db_name: str, db_user: str, db_password: str, db_port: str, db_host: str) -> sqlalchemy.Engine:
-    return create_engine(f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}")
-
 
 class Uploader(ABC):
     @abstractmethod
     def upload_data(self) -> None:
         """upload method for output"""
         ...
+
+
+class OpenWeatherApiUploader(Uploader):
+    def __init__(self, config):
+        self.config = config
+        self.db_connection = connect_to_db(db_name, db_user, db_password, db_port, db_host)
+
+    def upload_data(self) -> None:
+        self.config['TMP_DF'].to_sql(
+            name='weather_OW',
+            schema='weather_ow',
+            con=self.db_connection,
+            if_exists='append',
+            index=False
+        )
 
 
 class IconEUDBUploader(Uploader):

@@ -1,10 +1,47 @@
 import os
-from abc import ABC, abstractmethod
 
 import requests
+from abc import ABC, abstractmethod
+from dotenv import load_dotenv
+from datetime import datetime
 
 from pass_logging import logger
-from pass_utils import make_parallel
+from pass_utils import make_parallel, RandomKeyPicker, get_centroids, connect_to_db
+
+load_dotenv('../.env')
+
+db_name: str = os.getenv('DB_NAME')
+db_user: str = os.getenv('DB_USER')
+db_password: str = os.getenv('DB_PASSWORD')
+db_port: str = os.getenv('DB_PORT')
+db_host: str = os.getenv('DB_HOST')
+WEATHER_API_KEY_1: str = os.getenv('WEATHER_API_KEY_1')
+WEATHER_API_KEY_2: str = os.getenv('WEATHER_API_KEY_2')
+WEATHER_API_KEY_3: str = os.getenv('WEATHER_API_KEY_3')
+WEATHER_API_KEY_4: str = os.getenv('WEATHER_API_KEY_4')
+WEATHER_API_KEY_5: str = os.getenv('WEATHER_API_KEY_5')
+WEATHER_API_KEY_6: str = os.getenv('WEATHER_API_KEY_6')
+WEATHER_API_KEY_7: str = os.getenv('WEATHER_API_KEY_7')
+WEATHER_API_KEY_8: str = os.getenv('WEATHER_API_KEY_8')
+WEATHER_API_KEY_9: str = os.getenv('WEATHER_API_KEY_9')
+WEATHER_API_KEY_10: str = os.getenv('WEATHER_API_KEY_10')
+WEATHER_API_KEY_11: str = os.getenv('WEATHER_API_KEY_11')
+WEATHER_API_KEY_12: str = os.getenv('WEATHER_API_KEY_12')
+
+WEATHER_API_KEYS: list = [
+    # WEATHER_API_KEY_1,
+    WEATHER_API_KEY_2,
+    WEATHER_API_KEY_3,
+    WEATHER_API_KEY_4,
+    WEATHER_API_KEY_5,
+    WEATHER_API_KEY_6,
+    WEATHER_API_KEY_7,
+    WEATHER_API_KEY_8,
+    WEATHER_API_KEY_9,
+    WEATHER_API_KEY_10,
+    WEATHER_API_KEY_11,
+    WEATHER_API_KEY_12,
+]
 
 
 class Downloader(ABC):
@@ -12,6 +49,35 @@ class Downloader(ABC):
     def get_data(self) -> list:
         """Download method varies depending on weather source"""
         ...
+
+
+class OpenWeatherApiDownloader(Downloader):
+    db_connection = connect_to_db(db_name, db_user, db_password, db_port, db_host)
+
+    def __init__(self, config):
+        self.picker = RandomKeyPicker(config["API_KEYS"])
+        self.url_elem: str = config["URL_ELEM"]
+        self.tmp_df = config["TMP_DF"]
+
+    def get_data(self):
+        self.tmp_df.extend(
+            make_parallel(
+                func=self.get_single_coords,
+                items=[(row.id, row.geom) for index, row in get_centroids(self.db_connection).head(2).iterrows()],
+                # TODO UNLOCK FOR EVERY ITEM
+                url_elem=self.url_elem
+            )
+        )
+
+    def get_single_coords(self, id_geom, url_elem):
+        id_pt, geom = id_geom
+        url: str = f'https://api.openweathermap.org/data/2.5/{url_elem}?lat={geom.y}&lon={geom.x}&appid={self.picker.pick_random_key()}&units=metric'
+
+        try:
+            # logger.info(f"...requesting data {url}")
+            return [id_pt, requests.get(url).json()]
+        except requests.exceptions.RequestException as e:
+            raise SystemExit(e)
 
 
 class IconEuApiDownloader(Downloader):
@@ -50,7 +116,6 @@ class IconEuApiDownloader(Downloader):
             items=links,
         )
         logger.info("Downloading completed!")
-
 
     def get_single_file(self, url):
         try:
@@ -100,4 +165,5 @@ class IconEuApiDownloader(Downloader):
 
 
 if __name__ == "__main__":
-    pass
+    downloader = OpenWeatherApiDownloader(config={"URL_ELEM": "weather", "API_KEYS": WEATHER_API_KEYS})
+    print(downloader.get_data())
