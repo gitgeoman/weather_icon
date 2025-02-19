@@ -43,6 +43,7 @@ class WeatherArea(ABC):
 class FactoryWeatherICONPolandToday(WeatherArea):
     def get_config(self) -> dict:
         return {
+            'TABLE_NAME':'weather',
             'DATE': datetime.now(timezone.utc).strftime("%Y%m%d"),
             'LEVELS_T_SO': [0],
             'LEVELS_W_SO': [0],
@@ -63,6 +64,7 @@ class FactoryWeatherICONPolandForecast(WeatherArea):
 
     def get_config(self) -> dict:
         return {
+            'TABLE_NAME': 'weather',
             'DATE': datetime.now(timezone.utc).strftime("%Y%m%d"),
             'LEVELS_T_SO': [0],
             'LEVELS_W_SO': [0],
