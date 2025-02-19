@@ -39,7 +39,6 @@ class HandlerIconEuWeather(HandlerWeatherFactory):
         return weather_uploader.IconEUDBUploader(config=kwargs["config"])
 
 
-
 class HandlerOWREGIONWeather(HandlerWeatherFactory):
     """Factory for handling ICON-EU weather data."""
 

@@ -31,6 +31,7 @@ class WeatherArea(ABC):
         uploader = self.handler.get_uploader(config=self.config)
 
         logger.info(f"...starting process ")
+
         downloader.get_data()
         extractor.extract()
         transformer.transform_data()
@@ -59,6 +60,7 @@ class FactoryWeatherICONPolandToday(WeatherArea):
 
 
 class FactoryWeatherICONPolandForecast(WeatherArea):
+
     def get_config(self) -> dict:
         return {
             'DATE': datetime.now(timezone.utc).strftime("%Y%m%d"),

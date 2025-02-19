@@ -15,14 +15,16 @@ class Extractor(ABC):
         """Extract method varies depending on weather source"""
         ...
 
+
 class OpenWeatherApiExtractor(Extractor):
     def __init__(self, config):
-        self.tmp_df = config['TMP_DF']
-
+        self.config = config  # Store the config as an instance variable
+        self.tmp_df = self.config['TMP_DF']
 
     def extract(self):
         id_pt, data = self.tmp_df[0]
-        self.tmp_df = pd.DataFrame([{
+
+        self.config['TMP_DF'] = pd.DataFrame([{
             'id_geom': id_pt,
             'temp': data['main']['temp'],
             'temp_max': data['main']['temp_max'],
@@ -55,7 +57,7 @@ class IconEuExtractor(Extractor):
     def extract(self):
 
         file_paths: list[str] = [os.path.join(self.output_folder, filename)
-                            for filename in os.listdir(self.output_folder) if filename.endswith(".bz2")]
+                                 for filename in os.listdir(self.output_folder) if filename.endswith(".bz2")]
         if not file_paths:
             logger.warning("Brak plików .bz2 w katalogu.")
             return

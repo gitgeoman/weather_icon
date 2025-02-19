@@ -60,19 +60,21 @@ class OpenWeatherApiDownloader(Downloader):
         self.tmp_df = config["TMP_DF"]
 
     def get_data(self):
-        self.tmp_df: list[str] = make_parallel(
-            func=self.get_single_coords,
-            items=[(row.id, row.geom) for index, row in get_centroids(self.db_connection).head(2).iterrows()],
-            # TODO UNLOCK FOR EVERY ITEM
-            url_elem=self.url_elem
-        )[0]
+        self.tmp_df.extend(
+            make_parallel(
+                func=self.get_single_coords,
+                items=[(row.id, row.geom) for index, row in get_centroids(self.db_connection).head(2).iterrows()],
+                # TODO UNLOCK FOR EVERY ITEM
+                url_elem=self.url_elem
+            )
+        )
 
     def get_single_coords(self, id_geom, url_elem):
         id_pt, geom = id_geom
         url: str = f'https://api.openweathermap.org/data/2.5/{url_elem}?lat={geom.y}&lon={geom.x}&appid={self.picker.pick_random_key()}&units=metric'
 
         try:
-            logger.info(f"...requesting data {url}")
+            # logger.info(f"...requesting data {url}")
             return [id_pt, requests.get(url).json()]
         except requests.exceptions.RequestException as e:
             raise SystemExit(e)

@@ -1,5 +1,5 @@
 import os
-
+import pandas as pd
 import geopandas as gpd
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -30,12 +30,17 @@ class Uploader(ABC):
 
 class OpenWeatherApiUploader(Uploader):
     def __init__(self, config):
-        self.tmp_df = config["TMP_DF"]
+        self.config = config
         self.db_connection = connect_to_db(db_name, db_user, db_password, db_port, db_host)
 
     def upload_data(self) -> None:
-        self.tmp_df.to_sql(name='weather_OW', schema='weather_ow', con=self.db_connection, if_exists='append',
-                           index=False)
+        self.config['TMP_DF'].to_sql(
+            name='weather_OW',
+            schema='weather_ow',
+            con=self.db_connection,
+            if_exists='append',
+            index=False
+        )
 
 
 class IconEUDBUploader(Uploader):
