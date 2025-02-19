@@ -39,14 +39,30 @@ class HandlerIconEuWeather(HandlerWeatherFactory):
         return weather_uploader.IconEUDBUploader(config=kwargs["config"])
 
 
-class HandlerOWREGIONWeather(HandlerWeatherFactory):
-    """Factory for handling ICON-EU weather data."""
+class HandlerOWREGIONWeatherToday(HandlerWeatherFactory):
+    """Factory for handling OpenWeather weather data."""
 
     def get_downloader(self, **kwargs) -> weather_downloader.Downloader:
         return weather_downloader.OpenWeatherApiDownloader(config=kwargs["config"])
 
     def get_extractor(self, **kwargs) -> weather_extractor.Extractor:
-        return weather_extractor.OpenWeatherApiExtractor(config=kwargs["config"])
+        return weather_extractor.OpenWeatherApiExtractorToday(config=kwargs["config"])
+
+    def get_transformer(self, **kwargs) -> weather_transformer.Transformer:
+        return weather_transformer.OpenWeatherApiTransformer(config=kwargs["config"])
+
+    def get_uploader(self, **kwargs) -> weather_uploader.Uploader:
+        return weather_uploader.OpenWeatherApiUploader(config=kwargs["config"])
+
+
+class HandlerOWREGIONWeatherForecast(HandlerWeatherFactory):
+    """Factory for handling OpenWeather weather data."""
+
+    def get_downloader(self, **kwargs) -> weather_downloader.Downloader:
+        return weather_downloader.OpenWeatherApiDownloader(config=kwargs["config"])
+
+    def get_extractor(self, **kwargs) -> weather_extractor.Extractor:
+        return weather_extractor.OpenWeatherApiExtractorForecast(config=kwargs["config"])
 
     def get_transformer(self, **kwargs) -> weather_transformer.Transformer:
         return weather_transformer.OpenWeatherApiTransformer(config=kwargs["config"])

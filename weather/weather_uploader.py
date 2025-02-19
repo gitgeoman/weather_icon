@@ -30,7 +30,7 @@ class OpenWeatherApiUploader(Uploader):
 
     def upload_data(self) -> None:
         self.config['TMP_DF'].to_sql(
-            name='weather_OW',
+            name=f'OW_{self.config["URL_ELEM"]}',
             schema='weather_ow',
             con=self.db_connection,
             if_exists='append',
@@ -56,8 +56,13 @@ class IconEUDBUploader(Uploader):
             gdf = gpd.read_file(file)
             engine = connect_to_db(db_name, db_user, db_password, db_port, db_host)
             logger.info(gdf.head())
-            gdf.to_postgis(f"weather_data_v2", schema="weather_icon", con=engine, if_exists="append",
-                           index=False)
+            gdf.to_postgis(
+                name=f"weather_data_v2",
+                schema="weather_icon",
+                con=engine,
+                if_exists="append",
+                index=False
+            )
 
             logger.info(f"Data successfully saved to database: {file}")
 

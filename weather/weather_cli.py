@@ -1,20 +1,25 @@
 from weather.weather_factories import FactoryWeatherICONPolandToday, FactoryWeatherICONPolandForecast, \
-    FactoryWeatherOWSUBREGIONToday
+    FactoryWeatherOWSUBREGIONToday, FactoryWeatherOWSUBREGIONForecast
 
 
 def handle_icon_weather_today() -> None:
-    weather_current = FactoryWeatherICONPolandToday()
-    weather_current.process()
+    handler = FactoryWeatherICONPolandToday()
+    handler.process()
 
 
 def handle_icon_weather_forecast() -> None:
-    weather_current = FactoryWeatherICONPolandForecast()
-    weather_current.process()
+    handler = FactoryWeatherICONPolandForecast()
+    handler.process()
 
 
 def handle_ow_weather_today() -> None:
-    weather_current = FactoryWeatherOWSUBREGIONToday()
-    weather_current.process()
+    handler = FactoryWeatherOWSUBREGIONToday()
+    handler.process()
+
+
+def handle_ow_weather_forecast() -> None:
+    handler = FactoryWeatherOWSUBREGIONForecast()
+    handler.process()
 
 
 if __name__ == "__main__":

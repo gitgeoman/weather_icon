@@ -120,10 +120,21 @@ class FactoryWeatherOWSUBREGIONToday(WeatherArea):
 
     def get_config(self) -> dict:
         return {
-            'TMP_DF': [],
+            "TMP_DF": [],
             "URL_ELEM": "weather",
             "API_KEYS": WEATHER_API_KEYS,
-            'AREA': Area.POLAND.get_bounds()
         }
 
-    handler = weather_interfaces.HandlerOWREGIONWeather()
+    handler = weather_interfaces.HandlerOWREGIONWeatherToday()
+
+
+class FactoryWeatherOWSUBREGIONForecast(WeatherArea):
+
+    def get_config(self) -> dict:
+        return {
+            "TMP_DF": [],
+            "URL_ELEM": "forecast",
+            "API_KEYS": WEATHER_API_KEYS,
+        }
+
+    handler = weather_interfaces.HandlerOWREGIONWeatherForecast()

@@ -16,7 +16,7 @@ class Extractor(ABC):
         ...
 
 
-class OpenWeatherApiExtractor(Extractor):
+class OpenWeatherApiExtractorToday(Extractor):
     def __init__(self, config):
         self.config = config  # Store the config as an instance variable
         self.tmp_df = self.config['TMP_DF']
@@ -46,6 +46,36 @@ class OpenWeatherApiExtractor(Extractor):
             **data['wind'],
             **data['coord']
         }])
+
+
+class OpenWeatherApiExtractorForecast(Extractor):
+    def __init__(self, config):
+        self.config = config  # Store the config as an instance variable
+        self.tmp_df = self.config['TMP_DF']
+
+    def extract(self):
+        id_pt, data = self.tmp_df[0]
+        weather_list = data["list"]
+        name = data["city"]["name"]
+        country = data["city"]["country"]
+
+        self.config['TMP_DF'] = pd.concat(
+            [pd.DataFrame([{
+                'id_geom': id_pt,
+                'clouds': t['clouds']['all'],
+                'visibility': t.get('visibility', 0),
+                'country': country,
+                'city': name,
+                "precip_type": "rain" if 'rain' in t else ("snow" if 'snow' in t else "no"),
+                "precip_value": t['rain']['3h'] if 'rain' in t else (t['snow']['3h'] if 'snow' in t else 0),
+                "precip_probab": t["pop"],
+                "update_time": datetime.fromtimestamp(t["dt"]),
+                **t['main'],
+                **t['wind'],
+                **data['city']['coord'],
+                **t['weather'][0],
+            }]) for t in weather_list],
+            ignore_index=True)
 
 
 class IconEuExtractor(Extractor):
