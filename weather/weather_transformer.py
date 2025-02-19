@@ -1,14 +1,10 @@
 import bz2
 import os
-
-from abc import ABC, abstractmethod
-import pygrib
-
-from shapely.geometry import Point
 import pandas as pd
 import geopandas as gpd
-import time
-
+import pygrib
+from abc import ABC, abstractmethod
+from shapely.geometry import Point
 from datetime import datetime, timezone, timedelta
 
 from pass_logging import logger
@@ -30,67 +26,56 @@ class IconEuTransformer(Transformer):
     def __init__(self, config):
         self.output_folder = config["DOWNLOAD_FOLDER_ICON"]
         self.temp_folder = config["TMP_FOLDER"]
+        self.day = config["DATE"]
+        self.FORECAST_HOURS = config["FORECAST_HOURS"]
 
     def transform_data(self):
         downloaded_files: list = [
             os.path.join(self.output_folder, filename)
             for filename in os.listdir(self.output_folder)
-            if filename.endswith(".grib2")
+            if filename.endswith(".grib2") and self.day in filename
         ]
-        task_start_time = time.time()
-        # FORECAST_HOURS = ["000", "003", "006"] # TODO comment after tests
-        FORECAST_HOURS = ["000", "003", "006", "009", "012", "015", "018", "021", "024", "027", "030", "033", "036",
-                          "039", "042", "048"]  # TODO uncomment after tests
-        for hour in FORECAST_HOURS:
+
+        for hour in self.FORECAST_HOURS:
             all_dataframes = []
-            hour_start_time = time.time()
             for file_path in downloaded_files:
                 if hour in file_path:
 
-                    print(f"Przetwarzanie pliku GRIB2: {file_path}")
+                    logger.info(f"Przetwarzanie pliku GRIB2: {file_path}")
                     try:
-                        # Corrected function name
                         df = self.transform_single_file(file_path)
                         all_dataframes.append(df)
                     except Exception as e:
-                        print(f"Błąd przetwarzania pliku {file_path}: {e}")
+                        logger.info(f"Błąd przetwarzania pliku {file_path}: {e}")
 
             if not all_dataframes:
-                print(f"No valid data to process for hour {hour}")
-                continue  # Skip this hour if no files were processed successfully
+                logger.info(f"No valid data to process for hour {hour}")
+                continue
 
-            # Combine all DataFrame objects into one
             combined_dataframe = pd.concat(all_dataframes, ignore_index=True)
-
-            # Remove duplicates in case of merging the same coordinates with different parameters
             combined_dataframe = combined_dataframe.groupby(['latitude', 'longitude'], as_index=False).first()
 
-            combined_dataframe["geometry"] = combined_dataframe.apply(lambda row: Point(row["longitude"], row["latitude"]), axis=1)
+            combined_dataframe["geometry"] = combined_dataframe.apply(
+                lambda row: Point(row["longitude"], row["latitude"]), axis=1)
             gdf = gpd.GeoDataFrame(
                 combined_dataframe,
                 geometry="geometry",
                 crs="EPSG:4326"
             )
 
-            print(gdf.head())
+            logger.info(gdf.head())
 
             if not os.path.exists(self.temp_folder):
                 os.makedirs(self.temp_folder)
-            output_file = os.path.join(self.temp_folder, f"combined_grib_data_{hour}.fgb")
+            output_file = os.path.join(self.temp_folder, f"combined_grib_data_{self.day}_{hour}.fgb")
             gdf.to_file(output_file, driver="flatgeobuf")
 
+            logger.info(f"Combined data saved to file: {output_file}")
 
-            print(f"Combined data saved to file: {output_file}")
-            hour_end_time = time.time()
-            print(f"Time taken for forecast hour {hour}: {hour_end_time - hour_start_time:.2f} seconds\n")
 
-        task_end_time = time.time()
-        print(f"Total task duration: {task_end_time - task_start_time:.2f} seconds")
-
-    def transform_single_file(self, file_path):  # Corrected function name
+    def transform_single_file(self, file_path):
         data_records = []
 
-        # Function to process GRIB messages
         def process_grib_message(grb):
             lats, lons = grb.latlons()
             values = grb.values
@@ -108,20 +93,16 @@ class IconEuTransformer(Transformer):
                 for lat, lon, value in zip(lats.flatten(), lons.flatten(), values.flatten())
             ]
 
-        # Open the GRIB file
         with pygrib.open(file_path) as grbs:
-            # Parallel processing
             grib_messages = list(grbs)
             results = make_parallel(process_grib_message, grib_messages)
 
-        # Flatten the collective results
-        data_records = [record for result in results for record in result]
+        data_records = [record for result in results for record in result] #splaszczania do df
 
-        # Convert the list of records to a Pandas DataFrame
         return pd.DataFrame(data_records)
 
 
 if __name__ == "__main__":
     # --------------------------- Transform  -------------------------------
-    transformer = IconEuTransformer()  # Corrected variable name
+    transformer = IconEuTransformer()
     transformer.transform_data()

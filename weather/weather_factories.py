@@ -6,8 +6,7 @@ from pass_logging import logger
 
 
 class WeatherArea(ABC):
-    "Base area of interest"
-
+    """Abstract class for weather area processing from different sources."""
     aoi_name = str
     resolution = str
     config: dict
@@ -29,32 +28,34 @@ class WeatherArea(ABC):
 
 
 class FactoryWeatherICONToday(WeatherArea):
-        config = {
-            'DATE': datetime.now(timezone.utc).strftime("%Y%m%d"),
-            'LEVELS_T_SO': [0],
-            'LEVELS_W_SO': [0],
-            'FORECAST_HOUR': "00",  # Prognozowana godzina ("00", "06", "12", "18")
-            'FORECAST_HOURS': [
-                "000", "003", "006", "009", "012", "015", "018", "021", "024"
-            ],
-            'BASE_URL': "https://opendata.dwd.de/weather/nwp/icon-eu/grib",
-            'DOWNLOAD_FOLDER_ICON': "./downloaded_files",
-            'TMP_FOLDER': './tmp'
-        }
-        handler = weather_interfaces.HandlerIconEuWeather()
+    config = {
+        'DATE': datetime.now(timezone.utc).strftime("%Y%m%d"),
+        'LEVELS_T_SO': [0],
+        'LEVELS_W_SO': [0],
+        'FORECAST_HOUR': "00",  # Prognozowana godzina ("00", "06", "12", "18")
+        'FORECAST_HOURS': [
+            "000", "003", "006", "009", "012", "015", "018", "021", "024"
+        ],
+        'BASE_URL': "https://opendata.dwd.de/weather/nwp/icon-eu/grib",
+        'DOWNLOAD_FOLDER_ICON': "./downloaded_files",
+        'TMP_FOLDER': './tmp'
+    }
+    handler = weather_interfaces.HandlerIconEuWeather()
 
 
 class FactoryWeatherICONForecast(WeatherArea):
-    def __init__(self):
-        self.DATE = datetime.now(timezone.utc).strftime("%Y%m%d")
-        self.LEVELS_T_SO = [0]
-        self.LEVELS_W_SO = [0]
-        self.FORECAST_HOUR = "00"  # Prognozowana godzina ("00", "06", "12", "18")
-        self.FORECAST_HOURS = [
+    config = {
+        'DATE': datetime.now(timezone.utc).strftime("%Y%m%d"),
+        'LEVELS_T_SO': [0],
+        'LEVELS_W_SO': [0],
+        'FORECAST_HOUR': "00",  # Prognozowana godzina ("00", "06", "12", "18")
+        'FORECAST_HOURS': [
             "000", "003", "006", "009", "012", "015", "018", "021", "024", "027",
             "030", "033", "036", "039", "042", "048"
-        ]
-        self.BASE_URL = "https://opendata.dwd.de/weather/nwp/icon-eu/grib"
-        self.DOWNLOAD_FOLDER_ICON = "./downloaded_files"
+        ],
+        'BASE_URL': "https://opendata.dwd.de/weather/nwp/icon-eu/grib",
+        'DOWNLOAD_FOLDER_ICON': "./downloaded_files",
+        'TMP_FOLDER': './tmp'
+    }
 
     handler = weather_interfaces.HandlerIconEuWeather()
