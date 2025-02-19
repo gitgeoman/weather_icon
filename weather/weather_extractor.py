@@ -31,6 +31,7 @@ class IconEuExtractor(Extractor):
 
     def extract_single_file(self, file_path: str) -> str | None:
         """Extracts a single file and returns its decompressed path."""
+
         output_file_path = os.path.join(self.output_folder, os.path.splitext(os.path.basename(file_path))[0])
 
         if os.path.exists(output_file_path):
@@ -48,9 +49,5 @@ class IconEuExtractor(Extractor):
             return None
 
 
-def main() -> None:
-    extractor = IconEuExtractor()
-    extractor.extract()
-
 if __name__ == "__main__":
-    main()
+    pass

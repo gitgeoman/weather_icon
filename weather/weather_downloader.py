@@ -1,8 +1,6 @@
 import os
 from abc import ABC, abstractmethod
 
-from datetime import datetime, timezone
-import pandas as pd
 import requests
 
 from pass_logging import logger
@@ -35,7 +33,6 @@ class IconEuApiDownloader(Downloader):
 
     def get_data(self) -> list:
 
-        # Generate ICON-EU file URLs
         links: list = self.generate_icon_links(
             date=self.DATE,
             hour=self.FORECAST_HOUR,
@@ -45,10 +42,8 @@ class IconEuApiDownloader(Downloader):
             base_url=self.BASE_URL,
         )
 
-        # Create output directory if it doesn't exist
         os.makedirs(self.DOWNLOAD_FOLDER_ICON, exist_ok=True)
 
-        # Download files in parallel
         logger.info(f"Downloading {len(links)} files...")
         make_parallel(
             func=self.get_single_file,  # Uses method from provided code
@@ -105,5 +100,4 @@ class IconEuApiDownloader(Downloader):
 
 
 if __name__ == "__main__":
-    downloader = IconEuApiDownloader()
-    downloaded_files = downloader.get_data()
+    pass

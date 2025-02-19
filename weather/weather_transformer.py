@@ -70,13 +70,14 @@ class IconEuTransformer(Transformer):
             if not os.path.exists(self.temp_folder):
                 os.makedirs(self.temp_folder)
             output_file = os.path.join(self.temp_folder, f"combined_grib_data_{self.day}_{hour}.fgb")
+            if os.path.exists(output_file):
+                os.remove(output_file) # rm if exist
             gdf.to_file(output_file, driver="flatgeobuf")
 
             logger.info(f"Combined data saved to file: {output_file}")
 
 
     def transform_single_file(self, file_path):
-        data_records = []
 
         def process_grib_message(grb):
             lats, lons = grb.latlons()
@@ -115,6 +116,4 @@ class IconEuTransformer(Transformer):
 
 
 if __name__ == "__main__":
-    # --------------------------- Transform  -------------------------------
-    transformer = IconEuTransformer()
-    transformer.transform_data()
+    pass
