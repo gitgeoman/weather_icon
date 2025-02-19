@@ -1,15 +1,10 @@
 import os
-import pandas as pd
 import geopandas as gpd
-import sqlalchemy
-from sqlalchemy import create_engine
+
 from abc import ABC, abstractmethod
+from dotenv import load_dotenv
 
 from pass_logging import logger
-
-from dotenv import load_dotenv
-import os
-
 from pass_utils import connect_to_db
 
 load_dotenv('../.env')
@@ -24,7 +19,7 @@ db_host: str = os.getenv('DB_HOST')
 class Uploader(ABC):
     @abstractmethod
     def upload_data(self) -> None:
-        """upload method for output"""
+        """upload method for db"""
         ...
 
 

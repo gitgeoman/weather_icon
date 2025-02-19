@@ -1,6 +1,3 @@
-import sqlalchemy
-
-from sqlalchemy import text
 from weather.weather_factories import FactoryWeatherICONPolandToday, FactoryWeatherICONPolandForecast, \
     FactoryWeatherOWSUBREGIONToday
 

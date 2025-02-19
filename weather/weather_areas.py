@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Area(Enum):
     POLAND = {
         "lat_min": 49.00,
@@ -31,6 +32,6 @@ class Area(Enum):
         "lon_min": -10.00,
         "lon_max": 40.00,
     }
+
     def get_bounds(self):
         return self.value
-

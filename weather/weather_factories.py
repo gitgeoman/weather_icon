@@ -1,12 +1,12 @@
 import os
+
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-
 from dotenv import load_dotenv
 
 from weather import weather_interfaces
-from pass_logging import logger
 from weather_areas import Area
+from pass_logging import logger
 
 
 class WeatherArea(ABC):

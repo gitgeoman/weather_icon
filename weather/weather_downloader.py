@@ -3,8 +3,6 @@ import os
 import requests
 from abc import ABC, abstractmethod
 from dotenv import load_dotenv
-from datetime import datetime
-
 from pass_logging import logger
 from pass_utils import make_parallel, RandomKeyPicker, get_centroids, connect_to_db
 
@@ -97,7 +95,7 @@ class IconEuApiDownloader(Downloader):
         self.BASE_URL = config["BASE_URL"]
         self.DOWNLOAD_FOLDER_ICON = config["DOWNLOAD_FOLDER_ICON"]
 
-    def get_data(self) -> list:
+    def get_data(self):
 
         links: list = self.generate_icon_links(
             date=self.DATE,

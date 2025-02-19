@@ -17,3 +17,5 @@ django-celery-beat
 redis
 djangorestframework
 django-cors-headers
+pygrib
+shapely

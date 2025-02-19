@@ -1,8 +1,8 @@
 import bz2
 import os
-from datetime import datetime
-
 import pandas as pd
+
+from datetime import datetime
 from abc import ABC, abstractmethod
 
 from pass_logging import logger
