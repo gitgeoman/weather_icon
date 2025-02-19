@@ -23,22 +23,8 @@ class IconEuApiDownloader(Downloader):
         # - `"t_2m"`: Temperatura na wysokości 2 metrów nad powierzchnią ziemi.
         # - `"tot_prec"`: Całkowita suma opadów.
     """
-    # config
-    # DATE = datetime.now(timezone.utc).strftime("%Y%m%d")
-    # LEVELS_T_SO = [0, ]  # 2, 5, 6, 18, 54, 162]
-    # LEVELS_W_SO = [0, ]  # 1, 3, 9, 27, 81, 243]
-    # FORECAST_HOUR: str = "00"  # Forecast hour ("00", "06", "12", "18" are typical values)
-    # # FORECAST_HOURS = ["000", "003", "006"] # TODO comment after tests
-    # FORECAST_HOURS = ["000", "003", "006", "009", "012", "015", "018", "021", "024", "027", "030", "033", "036", "039",
-    # "042", "048"] # TODO uncomment after tests
-    # BASE_URL = "https://opendata.dwd.de/weather/nwp/icon-eu/grib"
-    # DOWNLOAD_FOLDER_ICON = "./downloaded_files"
-    def __init__(self, config):
-        """
-        Initialize the downloader with configuration.
 
-        :param config: A dictionary containing necessary configuration
-        """
+    def __init__(self, config):
         self.DATE = config["DATE"]
         self.LEVELS_T_SO = config["LEVELS_T_SO"]
         self.LEVELS_W_SO = config["LEVELS_W_SO"]
@@ -72,13 +58,6 @@ class IconEuApiDownloader(Downloader):
 
 
     def get_single_file(self, url):
-        """
-        Pobiera plik z danego URL i zapisuje go w folderze docelowym.
-        Pominięcie pobierania, jeśli plik już istnieje.
-
-        :param url: URL pliku do pobrania.
-        :param download_folder: Ścieżka do folderu, gdzie plik ma zostać zapisany.
-        """
         try:
             filename = url.split("/")[-1]
             file_path = os.path.join(self.DOWNLOAD_FOLDER_ICON, filename)

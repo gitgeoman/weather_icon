@@ -7,19 +7,19 @@ class HandlerWeatherFactory(ABC):
     """handlerFactory gets, unpacks, uploads depending on source and target"""
 
     @abstractmethod
-    def get_downloader(self, config: dict) -> weather_downloader.Downloader:
+    def get_downloader(self, **kwargs) -> weather_downloader.Downloader:
         ...
 
     @abstractmethod
-    def get_extractor(self, config: dict) -> weather_extractor.Extractor:
+    def get_extractor(self, **kwargs) -> weather_extractor.Extractor:
         ...
 
     @abstractmethod
-    def get_transformer(self, config: dict) -> weather_transformer.Transformer:
+    def get_transformer(self, **kwargs) -> weather_transformer.Transformer:
         ...
 
     @abstractmethod
-    def get_uploader(self, config: dict) -> weather_uploader.Uploader:
+    def get_uploader(self, **kwargs) -> weather_uploader.Uploader:
         ...
 
 
