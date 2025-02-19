@@ -28,6 +28,8 @@ class IconEuTransformer(Transformer):
         self.temp_folder = config["TMP_FOLDER"]
         self.day = config["DATE"]
         self.FORECAST_HOURS = config["FORECAST_HOURS"]
+        self.area = config["AREA"]
+
 
     def transform_data(self):
         downloaded_files: list = [
@@ -83,6 +85,16 @@ class IconEuTransformer(Transformer):
             validity_datetime = datetime.strptime(
                 f"{grb.validityDate:08d}{grb.validityTime:04d}", "%Y%m%d%H%M"
             )
+            bounds = self.area  # This is set to `AREA_BOUNDS` from the config
+            lat_min, lat_max = bounds["lat_min"], bounds["lat_max"]
+            lon_min, lon_max = bounds["lon_min"], bounds["lon_max"]
+
+            mask = (lats >= lat_min) & (lats <= lat_max) & (lons >= lon_min) & (lons <= lon_max)
+
+            filtered_lats = lats[mask]
+            filtered_lons = lons[mask]
+            filtered_values = values[mask]
+
             return [
                 {
                     "latitude": lat,
@@ -90,7 +102,7 @@ class IconEuTransformer(Transformer):
                     parameter_name: value,
                     "update_on": validity_datetime,
                 }
-                for lat, lon, value in zip(lats.flatten(), lons.flatten(), values.flatten())
+                for lat, lon, value in zip(filtered_lats.flatten(), filtered_lons.flatten(), filtered_values.flatten())
             ]
 
         with pygrib.open(file_path) as grbs:

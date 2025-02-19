@@ -1,16 +1,16 @@
 import sqlalchemy
 
 from sqlalchemy import text
-from weather.weather_factories import FactoryWeatherICONToday, FactoryWeatherICONForecast
+from weather.weather_factories import FactoryWeatherICONPolandToday, FactoryWeatherICONPolandForecast
 
 
 def handle_icon_weather_today() -> None:
-    weather_current = FactoryWeatherICONToday()
+    weather_current = FactoryWeatherICONPolandToday()
     weather_current.process()
 
 
 def handle_icon_weather_forecast() -> None:
-    weather_current = FactoryWeatherICONForecast()
+    weather_current = FactoryWeatherICONPolandForecast()
     weather_current.process()
 
 

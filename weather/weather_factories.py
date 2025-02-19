@@ -3,11 +3,11 @@ from datetime import datetime, timezone
 
 from weather import weather_interfaces
 from pass_logging import logger
-
+from weather_areas import Area
 
 class WeatherArea(ABC):
     """Abstract class for weather area processing from different sources."""
-    aoi_name = str
+
     resolution = str
     config: dict
     handler: weather_interfaces.HandlerWeatherFactory
@@ -18,16 +18,17 @@ class WeatherArea(ABC):
         transformer = self.handler.get_transformer(config=self.config)
         uploader = self.handler.get_uploader(config=self.config)
 
-        logger.info(f"...rozpoczynam pobieranie danych ICON ")
+        logger.info(f"...starting process ")
         downloader.get_data()
         extractor.extract()
         transformer.transform_data()
         uploader.upload_data()
 
-        logger.info(f"...zakoczono ŁADOWNIE danych ICON")
+        logger.info(f"...process completed")
 
 
-class FactoryWeatherICONToday(WeatherArea):
+
+class FactoryWeatherICONPolandToday(WeatherArea):
     config = {
         'DATE': datetime.now(timezone.utc).strftime("%Y%m%d"),
         'LEVELS_T_SO': [0],
@@ -38,12 +39,13 @@ class FactoryWeatherICONToday(WeatherArea):
         ],
         'BASE_URL': "https://opendata.dwd.de/weather/nwp/icon-eu/grib",
         'DOWNLOAD_FOLDER_ICON': "./downloaded_files",
-        'TMP_FOLDER': './tmp'
+        'TMP_FOLDER': './tmp',
+        'AREA': Area.POLAND.get_bounds()
     }
     handler = weather_interfaces.HandlerIconEuWeather()
 
 
-class FactoryWeatherICONForecast(WeatherArea):
+class FactoryWeatherICONPolandForecast(WeatherArea):
     config = {
         'DATE': datetime.now(timezone.utc).strftime("%Y%m%d"),
         'LEVELS_T_SO': [0],
@@ -55,7 +57,8 @@ class FactoryWeatherICONForecast(WeatherArea):
         ],
         'BASE_URL': "https://opendata.dwd.de/weather/nwp/icon-eu/grib",
         'DOWNLOAD_FOLDER_ICON': "./downloaded_files",
-        'TMP_FOLDER': './tmp'
+        'TMP_FOLDER': './tmp',
+        'AREA': Area.POLAND.get_bounds()
     }
 
     handler = weather_interfaces.HandlerIconEuWeather()
