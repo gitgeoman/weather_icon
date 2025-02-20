@@ -25,13 +25,13 @@ class Uploader(ABC):
 
 class OpenWeatherApiUploader(Uploader):
     def __init__(self, config):
-        self.config = config # ć inaczej błąd referencji (zrywa referencje) !!
+        self.config = config # inaczej błąd referencji (zrywa referencje) !!
         self.table_name = config['URL_ELEM']
         self.db_connection = connect_to_db(db_name, db_user, db_password, db_port, db_host)
 
     def run(self) -> None:
         self.config['TMP_DF'].to_sql(
-            name=f'OW_{self.table_name}',
+            name=f'ow_{self.table_name}',
             schema='weather_ow',
             con=self.db_connection,
             if_exists='append',
@@ -49,6 +49,7 @@ class IconEUDBUploader(Uploader):
 
     def run(self) -> None:
         """Uploads data to database."""
+        engine = connect_to_db(db_name, db_user, db_password, db_port, db_host)
 
         for file in [
             os.path.join(self.temp_folder, filename)
@@ -57,10 +58,10 @@ class IconEUDBUploader(Uploader):
         ]:
             gdf = gpd.read_file(file)
             gdf.insert(0, 'pt_id', range(1, len(gdf) + 1))
-            engine = connect_to_db(db_name, db_user, db_password, db_port, db_host)
+
             logger.info(gdf.head())
             gdf.to_postgis(
-                name=f"ICON_{self.table_name}",
+                name=f"icon_{self.table_name}",
                 schema="weather_icon",
                 con=engine,
                 if_exists="append",
@@ -68,7 +69,7 @@ class IconEUDBUploader(Uploader):
             )
 
             logger.info(f"Data successfully saved to database: {file}")
-
+        engine.dispose()
 
 if __name__ == "__main__":
     pass
