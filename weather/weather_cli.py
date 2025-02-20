@@ -26,7 +26,6 @@ def handle_icon_weather_today() -> None:
 
 def handle_icon_weather_forecast() -> None:
     handler = FactoryWeatherICONPolandForecast()
-    #TODO CLEANING TABLE
     engine = connect_to_db(db_name, db_user, db_password, db_port, db_host)
     with engine.connect() as conn:
         conn.execute(text(
@@ -51,4 +50,4 @@ def handle_ow_weather_forecast() -> None:
 
 
 if __name__ == "__main__":
-    handle_ow_weather_forecast()
+    handle_icon_weather_forecast()
