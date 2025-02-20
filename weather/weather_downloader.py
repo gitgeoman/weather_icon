@@ -60,10 +60,10 @@ class OpenWeatherApiDownloader(Downloader):
 
 class IconEuApiDownloader(Downloader):
     """Downloader for ICON-EU weather model data.
-        # - `"t_so"`: Reprezentuje dane dotyczące temperatury profilu gleby.
-        # - `"w_so"`: Dane dotyczące wilgotności profilu gleby.
-        # - `"t_2m"`: Temperatura na wysokości 2 metrów nad powierzchnią ziemi.
-        # - `"tot_prec"`: Całkowita suma opadów.
+        # - `"t_so"`: Reprezentuje dane dotyczące temperatury profilu gleby. (Soil temperature)
+        # - `"w_so"`: Dane dotyczące wilgotności profilu gleby. (Column-integrated soil moisture)
+        # - `"t_2m"`: Temperatura na wysokości 2 metrów nad powierzchnią ziemi. (temperature)
+        # - `"tot_prec"`: Całkowita suma opadów. (Total precipitation)
     """
 
     def __init__(self, config):
