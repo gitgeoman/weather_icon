@@ -82,7 +82,7 @@ class IconEuExtractor(Extractor):
     """Extractor for ICON-EU GRIB2 files."""
 
     def __init__(self, config):
-        self.output_folder: str = config["DOWNLOAD_FOLDER_ICON"]
+        self.output_folder: str = f'{config["DOWNLOAD_FOLDER_ICON"]}/{config["DATE"]}'
 
     def run(self):
 

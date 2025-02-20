@@ -33,8 +33,8 @@ class OpenWeatherApiTransformer(Transformer):
 class IconEuTransformer(Transformer):
 
     def __init__(self, config):
-        self.output_folder = config["DOWNLOAD_FOLDER_ICON"]
-        self.temp_folder = config["TMP_FOLDER"]
+        self.output_folder = f'{config["DOWNLOAD_FOLDER_ICON"]}/{config["DATE"]}'
+        self.temp_folder = f'{config["TMP_FOLDER"]}/{config["DATE"]}'
         self.day = config["DATE"]
         self.FORECAST_HOURS = config["FORECAST_HOURS"]
         self.area = config["AREA"]
@@ -45,7 +45,7 @@ class IconEuTransformer(Transformer):
             for filename in os.listdir(self.output_folder)
             if filename.endswith(".grib2") and self.day in filename
         ]
-
+        logger.info(downloaded_files)
         for hour in self.FORECAST_HOURS:
             all_dataframes = []
             for file_path in downloaded_files:
@@ -76,8 +76,8 @@ class IconEuTransformer(Transformer):
             logger.info(gdf.head())
 
             if not os.path.exists(self.temp_folder):
-                os.makedirs(self.temp_folder)
-            output_file = os.path.join(self.temp_folder, f"combined_grib_data_{self.day}_{hour}.fgb")
+                os.makedirs(name=f'{self.temp_folder}', exist_ok=True)
+            output_file = os.path.join(f'{self.temp_folder}', f"combined_grib_data_{self.day}_{hour}.fgb")
             if os.path.exists(output_file):
                 os.remove(output_file)  # rm if exist
             gdf.to_file(output_file, driver="flatgeobuf")
@@ -90,6 +90,10 @@ class IconEuTransformer(Transformer):
             lats, lons = grb.latlons()
             values = grb.values
             parameter_name = grb.parameterName
+
+            if parameter_name in ['Soil temperature', 'Temperature']:
+                values = values - 273.15
+
             validity_datetime = datetime.strptime(
                 f"{grb.validityDate:08d}{grb.validityTime:04d}", "%Y%m%d%H%M"
             )

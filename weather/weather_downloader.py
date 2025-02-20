@@ -67,7 +67,7 @@ class IconEuApiDownloader(Downloader):
     """
 
     def __init__(self, config):
-        self.DATE = config["DATE"]
+        self.day = config["DATE"]
         self.LEVELS_T_SO = config["LEVELS_T_SO"]
         self.LEVELS_W_SO = config["LEVELS_W_SO"]
         self.FORECAST_HOUR = config["FORECAST_HOUR"]
@@ -78,7 +78,7 @@ class IconEuApiDownloader(Downloader):
     def run(self):
 
         links: list = self.generate_icon_links(
-            date=self.DATE,
+            date=self.day,
             hour=self.FORECAST_HOUR,
             levels_t_so=self.LEVELS_T_SO,
             levels_w_so=self.LEVELS_W_SO,
@@ -86,7 +86,7 @@ class IconEuApiDownloader(Downloader):
             base_url=self.BASE_URL,
         )
 
-        os.makedirs(self.DOWNLOAD_FOLDER_ICON, exist_ok=True)
+        os.makedirs(f'{self.DOWNLOAD_FOLDER_ICON}/{self.day}', exist_ok=True)
 
         logger.info(f"Downloading {len(links)} files...")
         make_parallel(
@@ -98,7 +98,7 @@ class IconEuApiDownloader(Downloader):
     def get_single_file(self, url):
         try:
             filename = url.split("/")[-1]
-            file_path = os.path.join(self.DOWNLOAD_FOLDER_ICON, filename)
+            file_path = os.path.join(f'{self.DOWNLOAD_FOLDER_ICON}/{self.day}', filename)
 
             os.makedirs(self.DOWNLOAD_FOLDER_ICON, exist_ok=True)
 
@@ -143,5 +143,4 @@ class IconEuApiDownloader(Downloader):
 
 
 if __name__ == "__main__":
-    downloader = OpenWeatherApiDownloader(config={"URL_ELEM": "weather", "API_KEYS": WEATHER_API_KEYS})
-    print(downloader.run())
+    pass

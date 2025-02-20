@@ -43,7 +43,7 @@ class IconEUDBUploader(Uploader):
     def __init__(self, config):
         self.table_name = config['TABLE_NAME']
         self.output_folder = config["DOWNLOAD_FOLDER_ICON"]
-        self.temp_folder = config["TMP_FOLDER"]
+        self.temp_folder = f'{config["TMP_FOLDER"]}/{config["DATE"]}'
 
     """Uploader for database."""
 
