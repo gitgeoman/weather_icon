@@ -56,6 +56,7 @@ class IconEUDBUploader(Uploader):
             if filename.endswith(".fgb")
         ]:
             gdf = gpd.read_file(file)
+            gdf.insert(0, 'pt_id', range(1, len(gdf) + 1))
             engine = connect_to_db(db_name, db_user, db_password, db_port, db_host)
             logger.info(gdf.head())
             gdf.to_postgis(
